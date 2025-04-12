@@ -114,8 +114,10 @@ body {
 }
 
 .hero-content h1 {
-    font-size: 3rem;
-    margin-bottom: 1rem;
+    font-size: 2.5rem;
+    margin-bottom: 20px;
+    /* color: #333; */
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.1);
 }
 
 .hero-content p {
@@ -138,7 +140,11 @@ body {
 }
 
 .hero-logo {
+    width: 200px;
+    height: 200px;
+    object-fit: contain;
     margin-bottom: 20px;
+    filter: drop-shadow(0 0 10px rgba(0, 0, 0, 0.2));
 }
 
 .hero-icon {
