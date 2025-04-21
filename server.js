@@ -12,91 +12,55 @@ app.use(cors());
 app.use(bodyParser.json());
 app.use(express.static('./'));
 
-// Create submissions directory if it doesn't exist
-const submissionsDir = path.join(__dirname, 'submissions');
-console.log('Submissions directory path:', submissionsDir);
-if (!fs.existsSync(submissionsDir)) {
-    console.log('Creating submissions directory...');
-    fs.mkdirSync(submissionsDir);
-    console.log('Submissions directory created successfully');
-} else {
-    console.log('Submissions directory already exists');
+// Path to the single submissions file in root directory
+const submissionsFile = path.join(__dirname, 'all-submissions.json');
+
+// Initialize the file with an empty array if it doesn't exist
+if (!fs.existsSync(submissionsFile)) {
+    fs.writeFileSync(submissionsFile, JSON.stringify([], null, 2));
 }
 
-// Form submission endpoint
-app.post('/submit-form', async (req, res) => {
+// Handle form submission
+app.post('/submit-form', (req, res) => {
+    const formData = req.body;
+    const timestamp = new Date().toISOString();
+    
+    // Read existing submissions
+    let submissions = [];
     try {
-        console.log('Received form submission:', req.body);
-        
-        // Validate required fields
-        const { name, email, subject, message } = req.body;
-        if (!name || !email || !subject || !message) {
-            console.error('Missing required fields:', { name, email, subject, message });
-            return res.status(400).json({ 
-                message: 'Missing required fields',
-                details: {
-                    name: !name ? 'Name is required' : null,
-                    email: !email ? 'Email is required' : null,
-                    subject: !subject ? 'Subject is required' : null,
-                    message: !message ? 'Message is required' : null
-                }
-            });
-        }
-        
-        // Create a timestamp for the filename
-        const timestamp = new Date().toISOString().replace(/[:.]/g, '-');
-        const filename = `submission-${timestamp}.json`;
-        const filePath = path.join(submissionsDir, filename);
-        
-        // Save submission to a file
-        const submissionData = {
-            name,
-            email,
-            subject,
-            message,
-            timestamp: new Date().toISOString()
-        };
-        
-        console.log('Saving submission to file:', filePath);
-        fs.writeFileSync(filePath, JSON.stringify(submissionData, null, 2));
-        
-        // Log to console
-        console.log('Form submission saved successfully:', filePath);
-        
-        res.status(200).json({ 
-            message: 'Form submitted successfully',
-            submission: submissionData
-        });
+        const fileContent = fs.readFileSync(submissionsFile, 'utf8');
+        submissions = JSON.parse(fileContent);
     } catch (error) {
-        console.error('Error submitting form:', error);
-        res.status(500).json({ 
-            message: 'Error submitting form',
-            error: error.message
-        });
+        console.error('Error reading submissions file:', error);
+    }
+
+    // Add new submission
+    const newSubmission = {
+        ...formData,
+        timestamp
+    };
+    submissions.push(newSubmission);
+
+    // Write updated submissions back to file
+    try {
+        fs.writeFileSync(submissionsFile, JSON.stringify(submissions, null, 2));
+        console.log('Form submission saved successfully');
+        res.json({ success: true, message: 'Form submitted successfully' });
+    } catch (error) {
+        console.error('Error saving submission:', error);
+        res.status(500).json({ success: false, message: 'Error saving form submission' });
     }
 });
 
-// Endpoint to view all submissions
-app.get('/view-submissions', (req, res) => {
+// Get all submissions
+app.get('/submissions', (req, res) => {
     try {
-        console.log('Fetching submissions from directory:', submissionsDir);
-        const files = fs.readdirSync(submissionsDir);
-        console.log('Found files:', files);
-        
-        const submissions = files.map(file => {
-            const filePath = path.join(submissionsDir, file);
-            const content = fs.readFileSync(filePath, 'utf8');
-            return JSON.parse(content);
-        });
-        
-        console.log('Returning submissions:', submissions);
+        const fileContent = fs.readFileSync(submissionsFile, 'utf8');
+        const submissions = JSON.parse(fileContent);
         res.json(submissions);
     } catch (error) {
         console.error('Error reading submissions:', error);
-        res.status(500).json({ 
-            message: 'Error reading submissions',
-            error: error.message
-        });
+        res.status(500).json({ error: 'Error reading submissions' });
     }
 });
 
@@ -104,6 +68,6 @@ const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
     console.log(`Server running on port ${PORT}`);
     console.log(`Main website: http://localhost:${PORT}`);
-    console.log(`View submissions at http://localhost:${PORT}/view-submissions`);
+    console.log(`View submissions at http://localhost:${PORT}/submissions`);
     console.log(`Admin page at http://localhost:${PORT}/admin.html`);
 }); 

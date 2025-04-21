@@ -3,131 +3,140 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Form Submissions - Admin</title>
+    <title>Admin Dashboard - VK SHIPPING SERVICES</title>
+    <link rel="stylesheet" href="styles.css">
     <style>
-        body {
-            font-family: Arial, sans-serif;
-            max-width: 1000px;
-            margin: 0 auto;
+        .submission-card {
+            background: white;
+            border-radius: 8px;
             padding: 20px;
-            background-color: #f5f5f5;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
         }
-        h1 {
-            color: #2c3e50;
-            border-bottom: 2px solid #3498db;
-            padding-bottom: 10px;
+        .submission-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
         }
-        .submission {
-            background-color: #fff;
-            border-radius: 5px;
-            padding: 15px;
-            margin-bottom: 15px;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        .submission-name {
+            font-weight: bold;
+            color: #333;
         }
-        .submission h3 {
-            margin-top: 0;
-            color: #3498db;
-        }
-        .submission p {
-            margin: 5px 0;
-        }
-        .submission .timestamp {
-            color: #7f8c8d;
+        .submission-timestamp {
+            color: #666;
             font-size: 0.9em;
         }
-        .no-submissions {
-            text-align: center;
-            padding: 30px;
-            background-color: #fff;
-            border-radius: 5px;
-            color: #7f8c8d;
+        .submission-content {
+            margin-top: 10px;
         }
-        .refresh-btn {
-            background-color: #3498db;
+        .submission-field {
+            margin-bottom: 8px;
+        }
+        .submission-label {
+            font-weight: bold;
+            color: #555;
+        }
+        .refresh-button {
+            background-color: #4CAF50;
             color: white;
+            padding: 10px 20px;
             border: none;
-            padding: 10px 15px;
             border-radius: 4px;
             cursor: pointer;
             margin-bottom: 20px;
         }
-        .refresh-btn:hover {
-            background-color: #2980b9;
+        .refresh-button:hover {
+            background-color: #45a049;
         }
-        .back-btn {
-            background-color: #2c3e50;
+        .back-button {
+            background-color: #2196F3;
             color: white;
+            padding: 10px 20px;
             border: none;
-            padding: 10px 15px;
             border-radius: 4px;
             cursor: pointer;
             margin-bottom: 20px;
             margin-right: 10px;
         }
-        .back-btn:hover {
-            background-color: #1a252f;
-        }
-        .button-container {
-            display: flex;
-            margin-bottom: 20px;
+        .back-button:hover {
+            background-color: #1976D2;
         }
     </style>
 </head>
 <body>
-    <h1>Form Submissions</h1>
-    <div class="button-container">
-        <button id="back-btn" class="back-btn">Back to Website</button>
-        <button id="refresh-btn" class="refresh-btn">Refresh Submissions</button>
-    </div>
-    <div id="submissions-container">
-        <div class="no-submissions">Loading submissions...</div>
+    <div class="container">
+        <h1>Form Submissions</h1>
+        <div class="button-container">
+            <button class="back-button" onclick="window.location.href='/'">Back to Website</button>
+            <button class="refresh-button" onclick="fetchSubmissions()">Refresh Submissions</button>
+        </div>
+        <div id="submissions-container"></div>
     </div>
 
     <script>
-        const submissionsContainer = document.getElementById('submissions-container');
-        const refreshBtn = document.getElementById('refresh-btn');
-        const backBtn = document.getElementById('back-btn');
+        function formatDate(dateString) {
+            const date = new Date(dateString);
+            return date.toLocaleString();
+        }
+
+        function createSubmissionCard(submission) {
+            const card = document.createElement('div');
+            card.className = 'submission-card';
+            
+            card.innerHTML = `
+                <div class="submission-header">
+                    <span class="submission-name">${submission.name}</span>
+                    <span class="submission-timestamp">${formatDate(submission.timestamp)}</span>
+                </div>
+                <div class="submission-content">
+                    <div class="submission-field">
+                        <span class="submission-label">Email:</span> ${submission.email}
+                    </div>
+                    <div class="submission-field">
+                        <span class="submission-label">Subject:</span> ${submission.subject}
+                    </div>
+                    <div class="submission-field">
+                        <span class="submission-label">Message:</span> ${submission.message}
+                    </div>
+                </div>
+            `;
+            
+            return card;
+        }
+
+        function displaySubmissions(submissions) {
+            const container = document.getElementById('submissions-container');
+            container.innerHTML = '';
+            
+            if (submissions.length === 0) {
+                container.innerHTML = '<p>No submissions yet.</p>';
+                return;
+            }
+            
+            submissions.forEach(submission => {
+                const card = createSubmissionCard(submission);
+                container.appendChild(card);
+            });
+        }
 
         async function fetchSubmissions() {
             try {
-                submissionsContainer.innerHTML = '<div class="no-submissions">Loading submissions...</div>';
-                
-                const response = await fetch('/view-submissions');
-                const submissions = await response.json();
-                
-                if (submissions.length === 0) {
-                    submissionsContainer.innerHTML = '<div class="no-submissions">No submissions yet.</div>';
-                    return;
+                const response = await fetch('/all-submissions.json');
+                if (!response.ok) {
+                    throw new Error('Failed to fetch submissions');
                 }
-                
-                // Sort submissions by timestamp (newest first)
-                submissions.sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
-                
-                submissionsContainer.innerHTML = submissions.map(submission => `
-                    <div class="submission">
-                        <h3>${submission.subject}</h3>
-                        <p><strong>Name:</strong> ${submission.name}</p>
-                        <p><strong>Email:</strong> ${submission.email}</p>
-                        <p><strong>Message:</strong> ${submission.message}</p>
-                        <p class="timestamp">Submitted: ${new Date(submission.timestamp).toLocaleString()}</p>
-                    </div>
-                `).join('');
+                const submissions = await response.json();
+                displaySubmissions(submissions);
             } catch (error) {
                 console.error('Error fetching submissions:', error);
-                submissionsContainer.innerHTML = '<div class="no-submissions">Error loading submissions. Please try again.</div>';
+                document.getElementById('submissions-container').innerHTML = 
+                    '<p>Error loading submissions. Please try again later.</p>';
             }
         }
 
-        // Fetch submissions on page load
-        fetchSubmissions();
-
-        // Refresh button click handler
-        refreshBtn.addEventListener('click', fetchSubmissions);
-
-        // Back button click handler
-        backBtn.addEventListener('click', () => {
-            window.location.href = '/';
-        });
+        // Fetch submissions when the page loads
+        document.addEventListener('DOMContentLoaded', fetchSubmissions);
     </script>
 </body>
 </html> 
