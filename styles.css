@@ -948,4 +948,8 @@ footer {
     .feature-icon i {
         font-size: 2.5rem;
     }
+}
+
+.hidden {
+    display: none;
 } 

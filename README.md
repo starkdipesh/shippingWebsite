@@ -31,8 +31,8 @@ A modern, responsive website for an import-export business built with HTML, CSS,
 ├── script.js           # JavaScript functionality
 ├── server.js           # Node.js server
 ├── public/             # Static files
-├── index.html      # Test form page
-├── admin.html      # Admin page to view submissions
+│   ├── index.html      # Test form page
+│   └── admin.html      # Admin page to view submissions
 ├── submissions/        # Directory for storing form submissions
 ├── .env                # Environment variables
 ├── package.json        # Project dependencies
