@@ -142,7 +142,8 @@
         <div class="container">
             <h2>Contact Us</h2>
             <div class="contact-content">
-                <form name="contact" method="POST" data-netlify="true" netlify-honeypot="bot-field">
+                <form name="contact" method="POST" data-netlify="true" netlify-honeypot="bot-field" id="contact-form">
+                    <input type="hidden" name="form-name" value="contact" />
                     <p class="hidden">
                         <label>Don't fill this out if you're human: <input name="bot-field" /></label>
                     </p>
@@ -152,6 +153,7 @@
                     <textarea name="message" placeholder="Your Message" required></textarea>
                     <button type="submit" class="submit-btn">Send Message</button>
                 </form>
+                <div id="message-container" class="message-container"></div>
                 <div class="contact-info">
                     <div class="info-item">
                         <i class="fas fa-map-marker-alt"></i>
@@ -167,7 +169,6 @@
                     </div>
                 </div>
             </div>
-            <div id="message-container" class="message-container"></div>
         </div>
     </section>
 

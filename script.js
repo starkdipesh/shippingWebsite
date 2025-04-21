@@ -63,6 +63,7 @@ if (contactForm) {
         
         // Add loading animation to submit button
         const submitBtn = this.querySelector('.submit-btn');
+        const originalBtnText = submitBtn.innerHTML;
         submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Sending...';
         submitBtn.disabled = true;
         
@@ -72,24 +73,13 @@ if (contactForm) {
         try {
             // Get form data
             const formData = new FormData(this);
-            const formObject = {};
-            formData.forEach((value, key) => {
-                formObject[key] = value;
-            });
 
-            console.log('Sending form data:', formObject);
-
-            // Send data to server
-            const response = await fetch('/submit-form', {
+            // Submit to Netlify
+            const response = await fetch('/', {
                 method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify(formObject)
+                headers: { "Content-Type": "application/x-www-form-urlencoded" },
+                body: new URLSearchParams(formData).toString()
             });
-
-            const result = await response.json();
-            console.log('Server response:', result);
 
             if (response.ok) {
                 // Show success message
@@ -99,37 +89,20 @@ if (contactForm) {
                 
                 // Reset form
                 this.reset();
-                
-                // Reset button
-                submitBtn.innerHTML = 'Send Message';
-                submitBtn.disabled = false;
-                
-                // Hide success message after 5 seconds
-                setTimeout(() => {
-                    messageContainer.style.display = 'none';
-                }, 5000);
             } else {
-                // Handle validation errors
-                if (response.status === 400 && result.details) {
-                    const errorMessages = Object.entries(result.details)
-                        .filter(([_, message]) => message !== null)
-                        .map(([field, message]) => `${field}: ${message}`)
-                        .join('\n');
-                    throw new Error(errorMessages);
-                }
-                throw new Error(result.message || 'Error submitting form');
+                throw new Error('Form submission failed');
             }
         } catch (error) {
             console.error('Error:', error);
-            messageContainer.textContent = error.message || 'Error sending message. Please try again later.';
+            messageContainer.textContent = 'Error sending message. Please try again later.';
             messageContainer.className = 'message-container error';
             messageContainer.style.display = 'block';
-            
+        } finally {
             // Reset button
-            submitBtn.innerHTML = 'Send Message';
+            submitBtn.innerHTML = originalBtnText;
             submitBtn.disabled = false;
             
-            // Hide error message after 5 seconds
+            // Hide message after 5 seconds
             setTimeout(() => {
                 messageContainer.style.display = 'none';
             }, 5000);
