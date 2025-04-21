@@ -217,4 +217,55 @@ serviceCards.forEach(card => {
 // Add scroll event listener for animations
 window.addEventListener('scroll', animateOnScroll);
 // Initial check for elements in view
-animateOnScroll(); 
+animateOnScroll();
+
+document.addEventListener('DOMContentLoaded', function() {
+    const form = document.querySelector('form[name="contact"]');
+    const messageContainer = document.getElementById('message-container');
+
+    if (form) {
+        form.addEventListener('submit', async function(e) {
+            e.preventDefault();
+
+            try {
+                const formData = new FormData(form);
+                const response = await fetch(form.action, {
+                    method: 'POST',
+                    body: formData
+                });
+
+                if (response.ok) {
+                    // Show success message
+                    messageContainer.innerHTML = 'Thank you for your message! We will get back to you soon.';
+                    messageContainer.className = 'message-container message-success';
+                    form.reset();
+                } else {
+                    throw new Error('Form submission failed');
+                }
+            } catch (error) {
+                // Show error message
+                messageContainer.innerHTML = 'Sorry, there was a problem submitting your message. Please try again.';
+                messageContainer.className = 'message-container message-error';
+            }
+
+            // Show the message
+            messageContainer.style.display = 'block';
+
+            // Hide the message after 5 seconds
+            setTimeout(() => {
+                messageContainer.style.display = 'none';
+            }, 5000);
+        });
+    }
+
+    // Mobile menu toggle
+    const hamburger = document.querySelector('.hamburger');
+    const navLinks = document.querySelector('.nav-links');
+
+    if (hamburger && navLinks) {
+        hamburger.addEventListener('click', () => {
+            navLinks.classList.toggle('active');
+            hamburger.classList.toggle('active');
+        });
+    }
+}); 
