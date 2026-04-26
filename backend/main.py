@@ -467,6 +467,12 @@ async def seed_cargo_items():
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
+# Serve frontend build (production)
+import os.path
+frontend_build = os.path.join(os.path.dirname(__file__), "..", "frontend", "build")
+if os.path.exists(frontend_build):
+    app.mount("/", StaticFiles(directory=frontend_build, html=True), name="static")
+
 if __name__ == "__main__":
     import uvicorn
     uvicorn.run(app, host="0.0.0.0", port=8000)
