@@ -61,6 +61,7 @@ This guide will help you deploy your V K Shipping Services platform for free usi
    ```yaml
    Name: vknath-shipping-backend
    Runtime: Python 3
+   Root Directory: backend
    Build Command: pip install -r requirements.txt
    Start Command: uvicorn main:app --host 0.0.0.0 --port $PORT
    Instance Type: Free

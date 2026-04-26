@@ -4,6 +4,13 @@ import axios from 'axios';
 import toast from 'react-hot-toast';
 import { Lock, Eye, EyeOff } from 'lucide-react';
 
+const API_BASE = process.env.REACT_APP_API_URL || 'http://localhost:8000';
+
+// Configure axios with baseURL
+const axiosInstance = axios.create({
+  baseURL: API_BASE,
+});
+
 const Login = () => {
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
@@ -15,7 +22,7 @@ const Login = () => {
     setLoading(true);
 
     try {
-      const response = await axios.post('/api/auth/login', { password });
+      const response = await axiosInstance.post('/api/auth/login', { password });
       localStorage.setItem('token', response.data.access_token);
       toast.success('Login successful!');
       navigate('/admin/dashboard');

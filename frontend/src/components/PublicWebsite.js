@@ -3,6 +3,13 @@ import axios from 'axios';
 import toast from 'react-hot-toast';
 import { Phone, Mail, MapPin, Menu, X, Package } from 'lucide-react';
 
+const API_BASE = process.env.REACT_APP_API_URL || 'http://localhost:8000';
+
+// Configure axios with baseURL
+const axiosInstance = axios.create({
+  baseURL: API_BASE,
+});
+
 const PublicWebsite = () => {
   const [settings, setSettings] = useState({});
   const [cargoCategories, setCargoCategories] = useState([]);
@@ -31,7 +38,7 @@ const PublicWebsite = () => {
 
   const fetchSettings = async () => {
     try {
-      const response = await axios.get('/api/settings');
+      const response = await axiosInstance.get('/api/settings');
       setSettings(response.data);
     } catch (error) {
       console.error('Error fetching settings:', error);
@@ -40,7 +47,7 @@ const PublicWebsite = () => {
 
   const fetchCargoCategories = async () => {
     try {
-      const response = await axios.get('/api/cargo-categories');
+      const response = await axiosInstance.get('/api/cargo-categories');
       setCargoCategories(response.data);
     } catch (error) {
       console.error('Error fetching cargo categories:', error);
@@ -49,7 +56,7 @@ const PublicWebsite = () => {
 
   const fetchCargoItems = async () => {
     try {
-      const response = await axios.get('/api/cargo-items');
+      const response = await axiosInstance.get('/api/cargo-items');
       setCargoItems(response.data);
     } catch (error) {
       console.error('Error fetching cargo items:', error);
@@ -59,7 +66,7 @@ const PublicWebsite = () => {
   const handleContactSubmit = async (e) => {
     e.preventDefault();
     try {
-      await axios.post('/api/contact', formData);
+      await axiosInstance.post('/api/contact', formData);
       toast.success('Message sent successfully!');
       setFormData({ name: '', email: '', subject: '', message: '' });
     } catch (error) {
@@ -70,7 +77,7 @@ const PublicWebsite = () => {
   const handleQuoteSubmit = async (e) => {
     e.preventDefault();
     try {
-      await axios.post('/api/quote', quoteData);
+      await axiosInstance.post('/api/quote', quoteData);
       toast.success('Quote request sent successfully!');
       setQuoteData({ name: '', email: '', phone: '', cargo_type: '', message: '' });
     } catch (error) {
