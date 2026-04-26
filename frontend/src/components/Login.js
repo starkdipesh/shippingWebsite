@@ -22,7 +22,7 @@ const Login = () => {
     setLoading(true);
 
     try {
-      const response = await axiosInstance.post('/api/auth/login', { password });
+      const response = await axiosInstance.post('/api/login', { password });
       localStorage.setItem('token', response.data.access_token);
       toast.success('Login successful!');
       navigate('/admin/dashboard');
