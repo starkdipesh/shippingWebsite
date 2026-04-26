@@ -38,7 +38,7 @@ axiosInstance.interceptors.request.use(
 
 const AdminPanel = () => {
   const [activeTab, setActiveTab] = useState('dashboard');
-  const [settings, setSettings] = useState({});
+  const [, setSettings] = useState({});
   const [cargoCategories, setCargoCategories] = useState([]);
   const [cargoItems, setCargoItems] = useState([]);
   const [leads, setLeads] = useState([]);
